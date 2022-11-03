@@ -1,5 +1,3 @@
-#第一部分代码  
-#功能：将chunks文件夹下以及转wav文件夹以及test2下mp3跟压缩包下清除
 from datetime import datetime
 import os
 import glob 
@@ -23,10 +21,39 @@ import zipfile
 
 timetotal1=datetime.now()
 
-def remove_file():
+def remove_file(*path,type=all):
+    '''函数作用就是删除不同指定路径下指定格式的文件
+        type 必须是.mp3区分文件夹跟文件
+        path必须是末尾返斜杠
+    '''
+    for i in range(0,len( path),1):
+        
+        if type='all':
+            newpath=path[i]+'*'
+            for file in glob.glob(newpath):
+                os.remove(file)
+        else :
+            newpath=path[i]
+            for f in os.listdir(newpath):
+                if  f.endswith(type):
+                    os.remove(newpath+f)
+ 
 
-for file in glob.glob("C:\\Users\\Administrator\\Desktop\\test2\\chunks\\*"):
-    os.remove(file)
+
+if __name__ == "__main__":
+    #初始化参数各个路径
+    rootpath='C:\\Users\\Administrator\\Desktop\\test2\\'
+    chunkspath=rootpath+'chunks\\'
+    wavpath=rootpath+'转wav\\'
+    logpath=rootpath+'日志\\'
+    #删除chunks wav下所有文件，test2下mp3以及rar文件
+    remove_file(rootpath,type='.mp3')
+    #删除chunks wav下所有文件
+    remove_file(chunkspath,wavpath,type='all')
+
+
+
+                 
 # print('———chunks目录下文件删除完成———')
 for file in glob.glob("C:\\Users\\Administrator\\Desktop\\test2\\转wav\\*"):
     os.remove(file)
