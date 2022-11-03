@@ -28,7 +28,7 @@ def remove_file(*path,type=all):
     '''
     for i in range(0,len( path),1):
         
-        if type='all':
+        if type=='all':
             newpath=path[i]+'*'
             for file in glob.glob(newpath):
                 os.remove(file)
@@ -38,9 +38,22 @@ def remove_file(*path,type=all):
                 if  f.endswith(type):
                     os.remove(newpath+f)
 
+def downfenbianlv(downloadfile,url):
+'''
+  下载最低画质视频
+'''
+    try:
+        os.system("you-get -o "+downloadfile+"  --format=dash-flv360 "+url)
+    except:
+        os.system("you-get -o "+downloadfile+" --format=dash-flv720 "+url)
+    except:
+        os.system("you-get -o "+downloadfile+"  "+url)
+
+
 def download(dataurl):
 '''
 多线程下载函数，不放在一块是为了后面代码可移植性，不重复在一块
+dataurl是series
 '''
 
     thread_list = []
@@ -48,23 +61,11 @@ def download(dataurl):
     for i in range(1,len(dataurl)+1):
         #为每个新URL创建下载线程
         url = dataurl[i-1]
-    try:
-        t = threading.Thread(target=download360, args=(i,url,downloadfile))
+    
+        t = threading.Thread(target=downfenbianlv, args=(downloadfile,url))
             #先下载360分辨率
         thread_list.append(t)
         t.start()
-    except:
-        t = threading.Thread(target=download720, args=(i,url,downloadfile))
-            #没有360分辨率下载720
-        thread_list.append(t)
-        t.start()
-    except:
-        t = threading.Thread(target=downloaddefault, args=(i,url,downloadfile))
-            # 没有720分辨率下载最高画质
-        thread_list.append(t)
-        t.start()
-
-        #print(thread_list[0])
 
         #当线程池满时，等待线程结束
     while len(thread_list)>thread_num:  
@@ -75,21 +76,30 @@ def download(dataurl):
 
 
 
-def trans_format(downloadfile,oldformat,newformat):
-    #批量删除弹幕文件
-
-    for f in os.listdir(downloadfile):
-        if f.endswith(u'.xml'):
-            os.remove(downloadfile+f)
+def trans_format(downloadfile,to_save_trans,oldformat,newformat):
+'''
+  格式转换  mp4转换成mp3 mp3转换成pcm
+'''
+          
     #批量转换格式转换为mp3并删除mp4
-    for i in os.listdir(downloadfile):
-        if  os.path.splitext(i)[-1]=='.mp4':
+    if newformat=='.mp3':
+        for i in os.listdir(downloadfile):
+            if  os.path.splitext(i)[-1]==oldformat:
+                trans_name=downloadfile+i
+                save_name=downladfile+os.path.splitext(i)[0]+newformat
+                code='ffmpeg -y -i ' +trans_name+' -f mp3 '+save_name
+                subprocess.check_output(code,shell=True)
+    elif newformat=='.pcm':
+        for i in os.listdir(downloadfile):
             trans_name=downloadfile+i
-            save_name=downladfile+os.path.splitext(i)[0]+'.mp3'
-            code='ffmpeg -y -i ' +trans_name+' -f mp3 '+save_name
+            save_name=to_save_trans+os.path.splitext(i)[0]+'.pcm'
+            code='ffmpeg -y -i ' +trans_name+' -acodec pcm_s16le -f s16le -ac 1 -ar 16000 '+save_name
             subprocess.check_output(code,shell=True)
-            os.remove(trans_name)
-    # print('视频全部提取mp3')
+
+    else:
+        print('要转换的格式错误')
+            
+    
 
 
 
@@ -105,6 +115,24 @@ if __name__ == "__main__":
     remove_file(rootpath,type='.mp3')
     remove_file(rootpath,type='.zip')
     remove_file(chunkspath,wavpath,type='all')
+
+    #下载完成之后清空桌面下载链接,重新做已经存在，跑新的就不为空
+    if dataurl.empty is False:
+        download(dataurl)
+    
+     #清空桌面下载链接中的链接
+
+
+
+os.remove(trans_name)
+
+
+
+  #批量删除弹幕文件
+
+    for f in os.listdir(downloadfile):
+        if f.endswith(u'.xml'):
+            os.remove(downloadfile+f)
 
 
 
