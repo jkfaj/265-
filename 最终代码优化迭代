@@ -37,7 +37,60 @@ def remove_file(*path,type=all):
             for f in os.listdir(newpath):
                 if  f.endswith(type):
                     os.remove(newpath+f)
- 
+
+def download(dataurl):
+'''
+多线程下载函数，不放在一块是为了后面代码可移植性，不重复在一块
+'''
+
+    thread_list = []
+    thread_num = 8
+    for i in range(1,len(dataurl)+1):
+        #为每个新URL创建下载线程
+        url = dataurl[i-1]
+    try:
+        t = threading.Thread(target=download360, args=(i,url,downloadfile))
+            #先下载360分辨率
+        thread_list.append(t)
+        t.start()
+    except:
+        t = threading.Thread(target=download720, args=(i,url,downloadfile))
+            #没有360分辨率下载720
+        thread_list.append(t)
+        t.start()
+    except:
+        t = threading.Thread(target=downloaddefault, args=(i,url,downloadfile))
+            # 没有720分辨率下载最高画质
+        thread_list.append(t)
+        t.start()
+
+        #print(thread_list[0])
+
+        #当线程池满时，等待线程结束
+    while len(thread_list)>thread_num:  
+            #移除已结束线程
+        thread_list = [x for x in thread_list if x.is_alive()]
+        time.sleep(3)
+
+
+
+
+def trans_format(downloadfile,oldformat,newformat):
+    #批量删除弹幕文件
+
+    for f in os.listdir(downloadfile):
+        if f.endswith(u'.xml'):
+            os.remove(downloadfile+f)
+    #批量转换格式转换为mp3并删除mp4
+    for i in os.listdir(downloadfile):
+        if  os.path.splitext(i)[-1]=='.mp4':
+            trans_name=downloadfile+i
+            save_name=downladfile+os.path.splitext(i)[0]+'.mp3'
+            code='ffmpeg -y -i ' +trans_name+' -f mp3 '+save_name
+            subprocess.check_output(code,shell=True)
+            os.remove(trans_name)
+    # print('视频全部提取mp3')
+
 
 
 if __name__ == "__main__":
@@ -46,9 +99,11 @@ if __name__ == "__main__":
     chunkspath=rootpath+'chunks\\'
     wavpath=rootpath+'转wav\\'
     logpath=rootpath+'日志\\'
+    dataurl=pd.read_csv('C:\\Users\\Administrator\\Desktop\\下载链接.txt',header=None,sep='\t')
     #删除chunks wav下所有文件，test2下mp3以及rar文件
+
     remove_file(rootpath,type='.mp3')
-    #删除chunks wav下所有文件
+    remove_file(rootpath,type='.zip')
     remove_file(chunkspath,wavpath,type='all')
 
 
