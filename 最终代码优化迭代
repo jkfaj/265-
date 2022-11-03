@@ -63,7 +63,6 @@ dataurl是series
         url = dataurl[i-1]
     
         t = threading.Thread(target=downfenbianlv, args=(downloadfile,url))
-            #先下载360分辨率
         thread_list.append(t)
         t.start()
 
@@ -98,8 +97,39 @@ def trans_format(downloadfile,to_save_trans,oldformat,newformat):
 
     else:
         print('要转换的格式错误')
-            
-    
+
+def split_audio(audiopath,chunks_path):
+    '''
+定义分解函数，方便后面多线程调用
+'''
+    sound = AudioSegment.from_file(audiopath, format='mp3')
+    chunks = split_on_silence(sound,min_silence_len=520,silence_thresh=-30,keep_silence=800)#min_silence_len: 拆分语句时，静默满0.3秒则拆分。silence_thresh：小于-70dBFS以下的为静默。
+    filepath = os.path.split(audiopath)[0]
+    chunks_path = filepath+'\\chunks\\'
+    if not os.path.exists(chunks_path):os.mkdir(chunks_path)
+    for i in range(len(chunks)):
+        new = chunks[i]
+        save_name = chunks_path+audioname+'%04d.%s'%(i,audiotype)
+        new.export(save_name, format=audiotype)
+
+def rename_test(audiofile):
+'''
+将test2下mp3进行重命名，命名成数字，避免中文出现问题
+
+'''
+
+    onum=0
+    upnum=100
+    for i in os.listdir(audiofile):
+    #将mp3进行重命名，命名成数字，避免中文出现问题
+       if  os.path.splitext(i)[-1]=='.mp3':
+        
+            onum+=1
+            onewname=audiofile+str(upnum)+'.mp3'
+        
+            os.rename(audiofile+i,onewname)
+            upnum+=1
+    return onum
 
 
 
@@ -112,19 +142,39 @@ if __name__ == "__main__":
     dataurl=pd.read_csv('C:\\Users\\Administrator\\Desktop\\下载链接.txt',header=None,sep='\t')
     #删除chunks wav下所有文件，test2下mp3以及rar文件
 
-    remove_file(rootpath,type='.mp3')
     remove_file(rootpath,type='.zip')
     remove_file(chunkspath,wavpath,type='all')
 
     #下载完成之后清空桌面下载链接,重新做已经存在，跑新的就不为空
     if dataurl.empty is False:
+        remove_file(rootpath,type='.mp3')
         download(dataurl)
+
+    #清空桌面下载链接中的链接
+    file = open(dataurl, 'w').close()
+
+    trans_format(rootpath,rootpath,'.mp4','.mp3')
+
+    remove_file(rootpath,type='.xml')
+    remove_file(rootpath,type='.mp4')
+   
+    onum=rename_test(rootpath)
+
+    split_audio(rootpath,chunkspath)
+    thread_list = []
+    thread_num = 8
+    for i in range(100,100+onum,1):
+        audioname=str(i)
+        audiopath=audiofile+audioname+'.mp3'
+        t = threading.Thread(target=split_audio, args=(rootpath,chunkspath))
+        thread_list.append(t)
+        t.start()
+
+    while len(thread_list)>thread_num:  
+            #移除已结束线程
+        thread_list = [x for x in thread_list if x.is_alive()]
+        time.sleep(3)
     
-     #清空桌面下载链接中的链接
-
-
-
-os.remove(trans_name)
 
 
 
