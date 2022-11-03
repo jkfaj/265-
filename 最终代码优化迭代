@@ -3,10 +3,28 @@
 from datetime import datetime
 import os
 import glob 
+import base64
+import hashlib
+import hmac
+import requests
+import time
+import uuid
+from urllib import parse
+import pandas as pd
+import http.client
+import json
+from pydub import AudioSegment
+from pydub.silence import split_on_silence
+import threading
+import you_get
+import numpy as np
+import subprocess
+import zipfile
 
 timetotal1=datetime.now()
 
-time_1=datetime.now()
+def remove_file():
+
 for file in glob.glob("C:\\Users\\Administrator\\Desktop\\test2\\chunks\\*"):
     os.remove(file)
 # print('———chunks目录下文件删除完成———')
@@ -130,6 +148,12 @@ from pydub import AudioSegment
 from pydub.silence import split_on_silence
 import os
 import threading
+import you_get
+import threading
+import os
+import time
+import pandas as pd
+import subprocess
 
 time_5=datetime.now()
 
@@ -233,6 +257,16 @@ import pandas as pd
 import http.client
 from datetime import datetime
 import json
+from pydub import AudioSegment
+from pydub.silence import split_on_silence
+import os
+import threading
+import you_get
+import threading
+import os
+import time
+import pandas as pd
+import subprocess
 
 time_9=datetime.now()
 
@@ -289,6 +323,21 @@ import requests
 import time
 import uuid
 from urllib import parse
+import pandas as pd
+import http.client
+from datetime import datetime
+import json
+from pydub import AudioSegment
+from pydub.silence import split_on_silence
+import os
+import threading
+import you_get
+import threading
+import os
+import time
+import pandas as pd
+import subprocess
+
 class AccessToken:
     @staticmethod
     def _encode_text(text):
