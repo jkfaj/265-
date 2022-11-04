@@ -310,7 +310,22 @@ def rename_mp3():
         data3=data3.apply(lambda x:x[:80] if len(x)>81 else x)
     data3=data3.dropna(axis=0,how='any')
     data3.drop(data3[data3.values==''].index,inplace=True)
-    data3.drop_duplicates(keep='first',inplace=True)
+    datadup=data3.duplicates(keep='False')
+    #重复值进行排序
+    datadup['排序']=1
+    dupnum=1
+    for i in range(1,len(datadup),1)：
+        while datadup.loc[i,'语音内容']==datadup.loc[i-1,'语音内容']：
+            dupnum+=1
+            datadup.loc[i,'排序']=dupnum
+        datadup.loc[i,'排序']=dupnum
+    datadup['重复值']=datadup['语音内容']+datadup['排序']
+
+#data3重复数据重新命名
+        
+
+
+  #  data3.drop_duplicates(keep='first',inplace=True)
     for i in os.listdir(rename_file):
         for j in data3.index:
             jstr=str(j)
