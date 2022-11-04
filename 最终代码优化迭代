@@ -28,6 +28,18 @@ chunkspath=rootpath+'chunks\\'
 wavpath=rootpath+'转wav\\'
 logpath=rootpath+'日志\\'
 dataurl=pd.read_csv('C:\\Users\\Administrator\\Desktop\\下载链接.txt',header=None,sep='\t')
+#阿里云参数
+access_key_id = 'LTAI5tDCdQARDVh2XYMjJGLa'
+access_key_secret = 'znwuFhoqj6i9ojEwZWuPE4Hmp8anzs'
+token, expire_time = AccessToken.create_token(access_key_id, access_key_secret)
+appKey = 'gF3HRZAKLeo6uD84'
+url = 'https://nls-gateway-cn-shanghai.aliyuncs.com/stream/v1/asr'
+format = 'pcm'
+sampleRate = 16000
+enablePunctuationPrediction  = True
+enableInverseTextNormalization = True
+enableVoiceDetection  = False
+
 
 timetotal1=datetime.now()
 
@@ -124,6 +136,9 @@ def split_trans_aliyun(audiopath):
         pcm_name=wavpath+os.path.splitext(mp3name)[0]+'.pcm'
         code='ffmpeg -y -i ' +save_name+' -acodec pcm_s16le -f s16le -ac 1 -ar 16000 '+pcm_name
         subprocess.check_output(code,shell=True)
+
+
+  #批量上传到阿里云
 
 
 
@@ -246,18 +261,6 @@ class AccessToken:
         return None, None
 
 def aliyun(trans_wav,data2,request, token, audioFile):
-    access_key_id = 'LTAI5tDCdQARDVh2XYMjJGLa'
-    access_key_secret = 'znwuFhoqj6i9ojEwZWuPE4Hmp8anzs'
-    token, expire_time = AccessToken.create_token(access_key_id, access_key_secret)
-    appKey = 'gF3HRZAKLeo6uD84'
-
-# 服务请求地址
-    url = 'https://nls-gateway-cn-shanghai.aliyuncs.com/stream/v1/asr'
-    format = 'pcm'
-    sampleRate = 16000
-    enablePunctuationPrediction  = True
-    enableInverseTextNormalization = True
-    enableVoiceDetection  = False
 
 # 设置RESTful请求参数
     request = url + '?appkey=' + appKey
