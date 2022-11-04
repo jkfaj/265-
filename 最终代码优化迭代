@@ -19,6 +19,16 @@ import numpy as np
 import subprocess
 import zipfile
 
+
+'''
+全局变量声明
+'''
+rootpath='C:\\Users\\Administrator\\Desktop\\test2\\'
+chunkspath=rootpath+'chunks\\'
+wavpath=rootpath+'转wav\\'
+logpath=rootpath+'日志\\'
+dataurl=pd.read_csv('C:\\Users\\Administrator\\Desktop\\下载链接.txt',header=None,sep='\t')
+
 timetotal1=datetime.now()
 
 def remove_file(*path,type=all):
@@ -98,19 +108,24 @@ def trans_format(downloadfile,to_save_trans,oldformat,newformat):
     else:
         print('要转换的格式错误')
 
-def split_audio(audiopath,chunks_path):
+def split_trans_aliyun(audiopath):
     '''
-定义分解函数，方便后面多线程调用
+定义分解转换上传到阿里云函数，方便后面多线程调用
 '''
+    audiopath=rootpath
     sound = AudioSegment.from_file(audiopath, format='mp3')
     chunks = split_on_silence(sound,min_silence_len=520,silence_thresh=-30,keep_silence=800)#min_silence_len: 拆分语句时，静默满0.3秒则拆分。silence_thresh：小于-70dBFS以下的为静默。
-    filepath = os.path.split(audiopath)[0]
-    chunks_path = filepath+'\\chunks\\'
     if not os.path.exists(chunks_path):os.mkdir(chunks_path)
     for i in range(len(chunks)):
         new = chunks[i]
-        save_name = chunks_path+audioname+'%04d.%s'%(i,audiotype)
-        new.export(save_name, format=audiotype)
+        save_name = chunks_path+audioname+'%04d.%s'%(i,'mp3')
+        new.export(save_name, format='mp3')
+        mp3name=save_name.split("\\")[-1]
+        pcm_name=wavpath+os.path.splitext(mp3name)[0]+'.pcm'
+        code='ffmpeg -y -i ' +save_name+' -acodec pcm_s16le -f s16le -ac 1 -ar 16000 '+pcm_name
+        subprocess.check_output(code,shell=True)
+
+
 
 def rename_test(audiofile):
 '''
@@ -131,6 +146,162 @@ def rename_test(audiofile):
             upnum+=1
     return onum
 
+def process(request, token, audioFile) :
+'''
+阿里云第一段代码
+'''
+
+    # 读取音频文件
+    with open(audioFile, mode = 'rb') as f:
+        audioContent = f.read()
+
+    host = 'nls-gateway-cn-shanghai.aliyuncs.com'
+
+    # 设置HTTPS请求头部
+    httpHeaders = {
+        'X-NLS-Token': token,
+        'Content-type': 'application/octet-stream',
+        'Content-Length': len(audioContent)
+        }
+
+
+    # Python 2.x使用httplib
+    # conn = httplib.HTTPConnection(host)
+
+    # Python 3.x使用http.client
+    conn = http.client.HTTPConnection(host)
+    conn.request(method='POST', url=request, body=audioContent, headers=httpHeaders)
+    response = conn.getresponse()
+    # print('Response status and response reason:')
+    # print(response.status ,response.reason)
+    body = response.read()
+    try:
+        # print('Recognize response is:')
+        body = json.loads(body)
+        # print(body)
+
+        status = body['status']
+        if status == 20000000 :
+            result = body['result']
+#           # print('Recognize result: ' + result)
+            return result
+        else :
+            print('Recognizer failed!')
+
+    except ValueError:
+        print('The response is not json format string')
+
+    conn.close()
+
+class AccessToken:
+    @staticmethod
+    def _encode_text(text):
+        encoded_text = parse.quote_plus(text)
+        return encoded_text.replace('+', '%20').replace('*', '%2A').replace('%7E', '~')
+    @staticmethod
+    def _encode_dict(dic):
+        keys = dic.keys()
+        dic_sorted = [(key, dic[key]) for key in sorted(keys)]
+        encoded_text = parse.urlencode(dic_sorted)
+        return encoded_text.replace('+', '%20').replace('*', '%2A').replace('%7E', '~')
+    @staticmethod
+    def create_token(access_key_id, access_key_secret):
+        parameters = {'AccessKeyId': access_key_id,
+                      'Action': 'CreateToken',
+                      'Format': 'JSON',
+                      'RegionId': 'cn-shanghai',
+                      'SignatureMethod': 'HMAC-SHA1',
+                      'SignatureNonce': str(uuid.uuid1()),
+                      'SignatureVersion': '1.0',
+                      'Timestamp': time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                      'Version': '2019-02-28'}
+        # 构造规范化的请求字符串
+        query_string = AccessToken._encode_dict(parameters)
+        #print('规范化的请求字符串: %s' % query_string)
+        # 构造待签名字符串
+        string_to_sign = 'GET' + '&' + AccessToken._encode_text('/') + '&' + AccessToken._encode_text(query_string)
+        #print('待签名的字符串: %s' % string_to_sign)
+        # 计算签名
+        secreted_string = hmac.new(bytes(access_key_secret + '&', encoding='utf-8'),
+                                   bytes(string_to_sign, encoding='utf-8'),
+                                   hashlib.sha1).digest()
+        signature = base64.b64encode(secreted_string)
+        #print('签名: %s' % signature)
+        # 进行URL编码
+        signature = AccessToken._encode_text(signature)
+        #print('URL编码后的签名: %s' % signature)
+        # 调用服务
+        full_url = 'http://nls-meta.cn-shanghai.aliyuncs.com/?Signature=%s&%s' % (signature, query_string)
+        # print('url: %s' % full_url)
+        # 提交HTTP GET请求
+        response = requests.get(full_url)
+        if response.ok:
+            root_obj = response.json()
+            key = 'Token'
+            if key in root_obj:
+                token = root_obj[key]['Id']
+                expire_time = root_obj[key]['ExpireTime']
+                return token, expire_time
+        #print(response.text)
+        return None, None
+
+def aliyun(trans_wav,data2,request, token, audioFile):
+    access_key_id = 'LTAI5tDCdQARDVh2XYMjJGLa'
+    access_key_secret = 'znwuFhoqj6i9ojEwZWuPE4Hmp8anzs'
+    token, expire_time = AccessToken.create_token(access_key_id, access_key_secret)
+    appKey = 'gF3HRZAKLeo6uD84'
+
+# 服务请求地址
+    url = 'https://nls-gateway-cn-shanghai.aliyuncs.com/stream/v1/asr'
+    format = 'pcm'
+    sampleRate = 16000
+    enablePunctuationPrediction  = True
+    enableInverseTextNormalization = True
+    enableVoiceDetection  = False
+
+# 设置RESTful请求参数
+    request = url + '?appkey=' + appKey
+    request = request + '&format=' + format
+    request = request + '&sample_rate=' + str(sampleRate)
+
+    if enablePunctuationPrediction :
+        request = request + '&enable_punctuation_prediction=' + 'true'
+
+    if enableInverseTextNormalization :
+        request = request + '&enable_inverse_text_normalization=' + 'true'
+
+    if enableVoiceDetection :
+        request = request + '&enable_voice_detection=' + 'true'
+
+    data2=pd.DataFrame(data=None,columns=['编号','语音内容'])
+    for i in os.listdir(trans_wav):
+        num=os.path.splitext(i)[0]
+        xunfei_wav=trans_wav+'\\'+i
+        audioFile = xunfei_wav
+        result= process(request, token, audioFile)
+    # print(num,result)
+        dic ={'编号':num,'语音内容':result}
+        data1=pd.DataFrame(dic,index=[0])
+        data2=data2.append(data1,ignore_index=True)
+
+def log_born(log_path,data2):
+    '''
+生成日志文件
+'''
+    now_time=datetime.now().strftime('%Y%m%d%H%M%S')
+    trans_txt=now_time+'.txt'
+    log_file=log_path+trans_txt
+    data2.to_csv(log_file,index=False,sep=' ')
+
+
+
+
+def thread_target(audiopath,chunks_path):
+'''
+  多线程函数自动切分 转换格式 阿里云识别 
+'''
+    split_audio(audiopath,chunks_path)
+
 
 
 if __name__ == "__main__":
@@ -147,8 +318,11 @@ if __name__ == "__main__":
 
     #下载完成之后清空桌面下载链接,重新做已经存在，跑新的就不为空
     if dataurl.empty is False:
+        print('正在下载链接中语音')
         remove_file(rootpath,type='.mp3')
         download(dataurl)
+    else:
+        print('跳过下载，直接使用test2里面mp3')
 
     #清空桌面下载链接中的链接
     file = open(dataurl, 'w').close()
@@ -159,6 +333,8 @@ if __name__ == "__main__":
     remove_file(rootpath,type='.mp4')
    
     onum=rename_test(rootpath)
+
+    data2=pd.DataFrame(data=None,columns=['编号','语音内容'])
 
     split_audio(rootpath,chunkspath)
     thread_list = []
