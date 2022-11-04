@@ -302,15 +302,8 @@ def rename_mp3():
 重新命名
 '''
     rename_file=chunkspath
-    data3=data2.groupby(data2['编号'])['语音内容'].apply(lambda x:x.str.cat(sep=''))
-    no_logo=['*',':','\'','<','>','|','\\','/','?']
 
-    for i in no_logo:
-        data3 =data3.apply(lambda x:x.replace( i,''))
-        data3=data3.apply(lambda x:x[:80] if len(x)>81 else x)
-    data3=data3.dropna(axis=0,how='any')
-    data3.drop(data3[data3.values==''].index,inplace=True)
-    datadup=data3.duplicates(keep='False')
+    datadup=data2.duplicates(keep='False')
     #重复值进行排序
     datadup['排序']=1
     dupnum=1
@@ -319,9 +312,31 @@ def rename_mp3():
             dupnum+=1
             datadup.loc[i,'排序']=dupnum
         datadup.loc[i,'排序']=dupnum
+    datadup['排序']=datadup['排序'].astype(str)
     datadup['重复值']=datadup['语音内容']+datadup['排序']
 
+    #data3重复数据重新命名
+    for i in data2['编号']：
+        for j in datadup['编号']：
+            if i==j:
+
+
+        
+
+
+
+    data3=data2.groupby(data2['编号'])['语音内容'].apply(lambda x:x.str.cat(sep=''))
+    no_logo=['*',':','\'','<','>','|','\\','/','?']
+
+    for i in no_logo:
+        data3 =data3.apply(lambda x:x.replace( i,''))
+        data3=data3.apply(lambda x:x[:80] if len(x)>81 else x)
+    data3=data3.dropna(axis=0,how='any')
+    data3.drop(data3[data3.values==''].index,inplace=True)
+    
+
 #data3重复数据重新命名
+    for i 
         
 
 
