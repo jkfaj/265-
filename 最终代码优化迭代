@@ -297,14 +297,40 @@ def part_aliyun(start,end):
     
         
 
-def log_born(log_path,data2):
+def rename_mp3():
     '''
-生成日志文件
+重新命名
 '''
-    now_time=datetime.now().strftime('%Y%m%d%H%M%S')
-    trans_txt=now_time+'.txt'
-    log_file=log_path+trans_txt
-    data2.to_csv(log_file,index=False,sep=' ')
+    rename_file=chunkspath
+    data3=data2.groupby(data2['编号'])['语音内容'].apply(lambda x:x.str.cat(sep=''))
+    no_logo=['*',':','\'','<','>','|','\\','/','?']
+
+    for i in no_logo:
+        data3 =data3.apply(lambda x:x.replace( i,''))
+        data3=data3.apply(lambda x:x[:80] if len(x)>81 else x)
+    data3=data3.dropna(axis=0,how='any')
+    data3.drop(data3[data3.values==''].index,inplace=True)
+    data3.drop_duplicates(keep='first',inplace=True)
+    for i in os.listdir(rename_file):
+        for j in data3.index:
+            jstr=str(j)
+            jj=jstr.zfill(6)
+
+            if os.path.splitext(i)[0]==jj:
+                old_file=rename_file+i
+               #好兄弟加后缀的话放在这里，下面带#的代码就是例子，比这来
+      #        new_file=rename_file+data3[j]+'（素材分享群：123593137，获取更多素材）.mp3'
+                new_file=rename_file+data3[j]+'.mp3'
+                os.rename(old_file,new_file)
+
+    data2['编号']=data2['编号'].astype(str)
+
+    for i in os.listdir(rename_file):
+        for j in data2['编号']:
+            jstr=str(j)
+            jj=jstr.zfill(6)
+            if os.path.exists(rename_file+jj+'.mp3'):
+                os.remove(rename_file+jj+'.mp3')
 
 
 
@@ -355,11 +381,24 @@ if __name__ == "__main__":
             #移除已结束线程
             thread_list = [x for x in thread_list if x.is_alive()]
             time.sleep(3)
+
     #获取转wav下所有文件构造列表，进行多线程
     all_name=[]
     for i in os.listdir(wavpath):
         all_name.append(i)
-#上传到阿里云
+    trans_num=len(all_name)
+    #两个线程上传阿里云
+    threads=[ threading.Thread(target=part_aliyun, args=(1,int(trans_num/2)),
+              threading.Thread(target=part_aliyun, args=(int(trans_num/2),trans_num)]
+    for t in threads:
+        t.start()
+
+    now_time=datetime.now().strftime('%Y%m%d%H%M%S')
+    log_file=rootpath+"日志\\"+now_time+'.txt'
+    data2.to_csv(log_file,index=False,sep=' ')
+
+
+
 
    
    
