@@ -357,6 +357,17 @@ def rename_mp3():
             jj=jstr.zfill(6)
             if os.path.exists(rename_file+jj+'.mp3'):
                 os.remove(rename_file+jj+'.mp3')
+def houzhui():
+'''
+   增加一个后缀版本
+'''  
+    for i in os.listdir(chunkspath):
+        oldname=chunkspath+i
+        newi=os.path.splitext(i)[0]
+        newname=chunkspath+newi+'（素材分享群：123593137，获取更多素材）.mp3'
+        os.rename(oldname,newname)
+                
+
 
 def zipDir(source_dir, output_filename):
     """
@@ -383,6 +394,10 @@ def zipDir(source_dir, output_filename):
         return output_filename
     return
 
+def filemove():
+'''
+将两个压缩文件移动到指定的路径
+'''
 
 
 
@@ -442,6 +457,8 @@ if __name__ == "__main__":
     data2.to_csv(log_file,index=False,sep=' ')
     rename_mp3()
     zipDir(chunkspath,rootpath+'请命名.zip')
+    houzhui()
+    zipDir(chunkspath,rootpath+'请命名_hz.zip')
     timetotal2=datetime.now()
     time_total=timetotal2-timetotal1
     print('代码运行总时间',time_total)
