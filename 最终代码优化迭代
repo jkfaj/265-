@@ -250,7 +250,7 @@ def split_trans(min_silence_len=default_silence,silence_thresh=default_thresh):
         subprocess.check_output(code,shell=True)
 
 
-  #批量上传到阿里云
+ 
 
 
 
