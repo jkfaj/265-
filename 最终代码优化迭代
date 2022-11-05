@@ -170,12 +170,12 @@ def single():
             name=datam[i].split()
             namelist.append(name[0])
             urllist.append(i)
-                if len(name)>1:
-                    silencelist.append(name[1])
-                    threshlist.appwnd(name[2])
-                else:
-                    silencelist.append(default_silence)
-                    threshlist.append(default_thresh)
+            if len(name)>1:
+                silencelist.append(name[1])
+                threshlist.appwnd(name[2])
+            else:
+                silencelist.append(default_silence)
+                threshlist.append(default_thresh)
     return namelist,urllist,silencelist,threshlist
     
     
