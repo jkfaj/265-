@@ -523,9 +523,9 @@ if __name__ == "__main__":
             
             download(dataurl[urllist[len(namelist)-1]+1:urllist[urlnum]])
             execute_one(namelist[len(namelist)-1],silencelist[len(namelist)-1],thresh[len(namelist)-1])
-                
-     print('跳过下载，直接使用test2里面mp3')
-     execute_one()
+    else:           
+        print('跳过下载，直接使用test2里面mp3')
+        execute_one()
 
 
  
