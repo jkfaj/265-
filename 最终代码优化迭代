@@ -256,10 +256,10 @@ def rename_test(audiofile):
     upnum=100
     for i in os.listdir(audiofile):
     #将mp3进行重命名，命名成数字，避免中文出现问题
-       if  os.path.splitext(i)[-1]=='.mp3':
+       if  os.path.splitext(i)[-1]=='.mp4':
         
             onum+=1
-            onewname=audiofile+str(upnum)+'.mp3'
+            onewname=audiofile+str(upnum)+'.mp4'
         
             os.rename(audiofile+i,onewname)
             upnum+=1
@@ -455,12 +455,13 @@ def execute_one(name='请命名',silence=default_silence,thresh=default_thresh):
     remove_file(rootpath,type='.zip')
     remove_file(chunkspath,wavpath,type='all')
 
-    trans_format('.mp3')
+    
 
     remove_file(rootpath,type='.xml')
     remove_file(rootpath,type='.mp4')
    
     onum=rename_test(rootpath)
+    trans_format('.mp3')
     
     thread_list = []
     thread_num = 8
