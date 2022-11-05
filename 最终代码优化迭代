@@ -181,10 +181,7 @@ def single():
     
 
 def download(dataurl):
-'''
-多线程下载函数，不放在一块是为了后面代码可移植性，不重复在一块
-dataurl是series
-'''
+
 
     thread_list = []
     thread_num = 8
@@ -206,9 +203,9 @@ dataurl是series
 
 
 def trans_format(downloadfile,to_save_trans,oldformat,newformat):
-'''
-  格式转换  mp4转换成mp3 mp3转换成pcm
-'''
+
+ # 格式转换  mp4转换成mp3 mp3转换成pcm
+
           
     #批量转换格式转换为mp3并删除mp4
     if newformat=='.mp3':
@@ -229,9 +226,9 @@ def trans_format(downloadfile,to_save_trans,oldformat,newformat):
         print('要转换的格式错误')
 
 def split_trans(min_silence_len=default_silence,silence_thresh=default_thresh):
-    '''
-定义分解转换，方便后面多线程调用，阿里云单独两个线程
-'''
+    
+#定义分解转换，方便后面多线程调用，阿里云单独两个线程
+
     audiopath=rootpath
     sound = AudioSegment.from_file(audiopath, format='mp3')
     chunks = split_on_silence(sound,min_silence_len,silence_thresh,keep_silence=800)#min_silence_len: 拆分语句时，静默满0.3秒则拆分。silence_thresh：小于-70dBFS以下的为静默。
@@ -251,10 +248,10 @@ def split_trans(min_silence_len=default_silence,silence_thresh=default_thresh):
 
 
 def rename_test(audiofile):
-'''
-将test2下mp3进行重命名，命名成数字，避免中文出现问题
 
-'''
+#将test2下mp3进行重命名，命名成数字，避免中文出现问题
+
+
 
     onum=0
     upnum=100
@@ -270,9 +267,9 @@ def rename_test(audiofile):
     return onum
 
 def process(request, token, audioFile) :
-'''
-阿里云第一段代码
-'''
+
+#阿里云第一段代码
+
 
     # 读取音频文件
     with open(audioFile, mode = 'rb') as f:
@@ -319,9 +316,9 @@ def process(request, token, audioFile) :
 
 
 def part_aliyun(start,end,all_name):
-'''
-传递一部分到阿里云 start从1开始
-'''
+
+#传递一部分到阿里云 start从1开始
+
     
     for i in range(start,end,1):
         aliyun_wav=wavpath+all_name[i]
@@ -336,9 +333,9 @@ def part_aliyun(start,end,all_name):
         
 
 def rename_mp3():
-    '''
-重新命名
-'''
+    
+#重新命名
+
     rename_file=chunkspath
 
     datadup=data2[data2.duplicated('语音内容',keep='False')]
@@ -391,9 +388,9 @@ def rename_mp3():
             if os.path.exists(rename_file+jj+'.mp3'):
                 os.remove(rename_file+jj+'.mp3')
 def houzhui():
-'''
-   增加一个后缀版本
-'''  
+
+  # 增加一个后缀版本
+ 
     for i in os.listdir(chunkspath):
         oldname=chunkspath+i
         newi=os.path.splitext(i)[0]
@@ -428,10 +425,10 @@ def zipDir(source_dir, output_filename):
     return
 
 def movefile():
-'''
-复制到指定位置，然后解决重名问题要是重名了 改名
 
-'''
+#复制到指定位置，然后解决重名问题要是重名了 改名
+
+
     num=1
 
     for j in os.listdir(rootpath):
@@ -453,9 +450,9 @@ def movefile():
 
 
 def execute_one(name='请命名',silence=default_silence,thresh=default_thresh):
-'''
-  执行单个人物的执行代码
-'''
+
+ # 执行单个人物的执行代码
+
     remove_file(rootpath,type='.zip')
     remove_file(chunkspath,wavpath,type='all')
 
