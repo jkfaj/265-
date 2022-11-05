@@ -332,7 +332,7 @@ def part_aliyun(start,end,all_name):
     
         
 
-def rename_mp3():
+def rename_mp3(data2):
     
 #重新命名
 
@@ -492,7 +492,7 @@ def execute_one(name='请命名',silence=default_silence,thresh=default_thresh):
     now_time=datetime.now().strftime('%Y%m%d%H%M%S')
     log_file=rootpath+"日志\\"+now_time+'.txt'
     data2.to_csv(log_file,index=False,sep=' ')
-    rename_mp3()
+    rename_mp3(data2)
     #if判断，如果是，则用传进来的名字命名，如果不是请命名
     zipDir(chunkspath,rootpath+name+'语音包新版本.zip')
     houzhui()
