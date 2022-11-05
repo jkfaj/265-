@@ -179,7 +179,7 @@ def single():
             urllist.append(i)
             if len(name)>1:
                 silencelist.append(name[1])
-                threshlist.appwnd(name[2])
+                threshlist.append(name[2])
             else:
                 silencelist.append(default_silence)
                 threshlist.append(default_thresh)
