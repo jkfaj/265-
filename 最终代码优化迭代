@@ -154,9 +154,15 @@ def downfenbianlv(downloadfile,url):
     try:
         os.system("you-get -o "+downloadfile+"  --format=dash-flv360 "+url)
     except:
+        print('没有360分辨率的')
+
+    try:
         os.system("you-get -o "+downloadfile+" --format=dash-flv720 "+url)
     except:
-        os.system("you-get -o "+downloadfile+"  "+url)
+        print('没有720分辨率的')
+
+    
+    os.system("you-get -o "+downloadfile+"  "+url)
 
 def single():
 
