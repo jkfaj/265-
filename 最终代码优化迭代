@@ -344,7 +344,7 @@ def rename_mp3():
     datadup['排序']=1
     dupnum=1
     for i in range(1,len(datadup),1):
-        while datadup.loc[i,'语音内容']==datadup.loc[i-1,'语音内容']：
+        while datadup.loc[i,'语音内容']==datadup.loc[i-1,'语音内容']:
             dupnum+=1
             datadup.loc[i,'排序']=dupnum
         datadup.loc[i,'排序']=dupnum
