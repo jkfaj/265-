@@ -18,6 +18,7 @@ import you_get
 import numpy as np
 import subprocess
 import zipfile
+import shutil
 
 '''多人多链接
    将压缩包移动到指定文件夹，如果之前文件夹有重名，处理方式
@@ -429,6 +430,7 @@ def filemove():
 '''
 将两个压缩文件移动到指定的路径，解决重名问题
 '''
+    shutil.copy()
 
 def execute_one(name='请命名',silence,thresh):
 '''
@@ -487,6 +489,9 @@ def execute_one(name='请命名',silence,thresh):
     zipDir(chunkspath,rootpath+name+'.zip')
     houzhui()
     zipDir(chunkspath,rootpath+name+'_hz.zip')
+    shutil.copy(rootpath+name+'.zip',ziptofile+name+'.zip')
+    shutil.copy(rootpath+name+'_hz.zip',ziptofile+name+'_hz.zip')
+ 
  
 
 
