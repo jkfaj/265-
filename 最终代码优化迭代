@@ -19,7 +19,11 @@ import numpy as np
 import subprocess
 import zipfile
 
-
+'''多人多链接
+   将压缩包移动到指定文件夹，如果之前文件夹有重名，处理方式
+   b站如果是一个列表应该怎么下载，或者备注
+   多参数问题
+'''
 '''
 全局变量声明
 '''
@@ -29,6 +33,7 @@ wavpath=rootpath+'转wav\\'
 logpath=rootpath+'日志\\'
 dataurl=pd.read_csv('C:\\Users\\Administrator\\Desktop\\下载链接.txt',header=None,sep='\t')
 data2=pd.DataFrame(data=None,columns=['编号','语音内容'])
+# ziptofile=
 
 #阿里云参数
 access_key_id = 'LTAI5tDCdQARDVh2XYMjJGLa'
@@ -154,15 +159,15 @@ dataurl是series
         #为每个新URL创建下载线程
         url = dataurl[i-1]
     
-        t = threading.Thread(target=downfenbianlv, args=(downloadfile,url))
+        t = threading.Thread(target=downfenbianlv, args=(rootpath,url))
         thread_list.append(t)
         t.start()
 
         #当线程池满时，等待线程结束
-    while len(thread_list)>thread_num:  
+        while len(thread_list)>thread_num:  
             #移除已结束线程
-        thread_list = [x for x in thread_list if x.is_alive()]
-        time.sleep(3)
+            thread_list = [x for x in thread_list if x.is_alive()]
+            time.sleep(3)
 
 
 
@@ -280,12 +285,12 @@ def process(request, token, audioFile) :
 
 
 
-def part_aliyun(start,end):
+def part_aliyun(start,end,all_name):
 '''
 传递一部分到阿里云 start从1开始
 '''
     
-    for i in range(start-1,end,1):
+    for i in range(start,end,1):
         aliyun_wav=wavpath+all_name[i]
 
         result= process(request, token, aliyun_wav)
@@ -303,7 +308,8 @@ def rename_mp3():
 '''
     rename_file=chunkspath
 
-    datadup=data2.duplicates(keep='False')
+    datadup=data2[data2.duplicated('语音内容',keep='False')]
+    datadup.sort_values(by=['语音内容'],inplace=True)
     #重复值进行排序
     datadup['排序']=1
     dupnum=1
@@ -319,7 +325,7 @@ def rename_mp3():
     dataleft= pd.merge(left=data2,right=datadup,on='编号',how='left')   
     for i in  range(0,len(dataleft),1):
         if dataleft.loc[i,'重复值'].notnull():
-            dataleft.loc[i,'语音内容']=dataleft.loc[i,'重复值']
+            dataleft.loc[i,'语音内容']=dataleft.loc[i,'重复值']+'_duplicates'
     data2=dataleft.drop(['重复值'],axis=1)
 
     data3=data2.groupby(data2['编号'])['语音内容'].apply(lambda x:x.str.cat(sep=''))
@@ -383,12 +389,6 @@ def zipDir(source_dir, output_filename):
 
 if __name__ == "__main__":
     timetotal1=datetime.now()
-    #初始化参数各个路径
-    rootpath='C:\\Users\\Administrator\\Desktop\\test2\\'
-    chunkspath=rootpath+'chunks\\'
-    wavpath=rootpath+'转wav\\'
-    logpath=rootpath+'日志\\'
-    dataurl=pd.read_csv('C:\\Users\\Administrator\\Desktop\\下载链接.txt',header=None,sep='\t')
     #删除chunks wav下所有文件，test2下mp3以及rar文件
 
     remove_file(rootpath,type='.zip')
@@ -416,7 +416,7 @@ if __name__ == "__main__":
     thread_num = 8
     for i in range(100,100+onum,1):
         audioname=str(i)
-        audiopath=audiofile+audioname+'.mp3'
+        audiopath=rootpath+audioname+'.mp3'
         t = threading.Thread(target=split_trans, args=(audiopath))
         thread_list.append(t)
         t.start()
@@ -432,8 +432,8 @@ if __name__ == "__main__":
         all_name.append(i)
     trans_num=len(all_name)
     #两个线程上传阿里云
-    threads=[ threading.Thread(target=part_aliyun, args=(1,int(trans_num/2)),
-              threading.Thread(target=part_aliyun, args=(int(trans_num/2),trans_num)]
+    threads=[ threading.Thread(target=part_aliyun, args=(0,int(trans_num/2),all_name),
+              threading.Thread(target=part_aliyun, args=(int(trans_num/2),trans_num,all_name)]
     for t in threads:
         t.start()
 
