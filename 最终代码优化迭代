@@ -31,9 +31,10 @@ rootpath='C:\\Users\\Administrator\\Desktop\\test2\\'
 chunkspath=rootpath+'chunks\\'
 wavpath=rootpath+'转wav\\'
 logpath=rootpath+'日志\\'
-dataurl=pd.read_csv('C:\\Users\\Administrator\\Desktop\\下载链接.txt',header=None,sep='\t')
+dataurl=pd.read_csv('C:\\Users\\Administrator\\Desktop\\下载链接.txt',header=None,sep='\n')
 data2=pd.DataFrame(data=None,columns=['编号','语音内容'])
 # ziptofile=
+# ziptofile_hz=
 
 #阿里云参数
 access_key_id = 'LTAI5tDCdQARDVh2XYMjJGLa'
@@ -150,7 +151,7 @@ def single():
 '''
   将下载链接中多人进行拆分成单人，然后
 '''
-    datam=pd.read_csv
+    datam=dataurl
 
 def download(dataurl):
 '''
