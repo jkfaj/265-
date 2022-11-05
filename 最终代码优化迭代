@@ -173,7 +173,7 @@ def single():
     threshlist=[]
     for i in range(0,len(datam),1):
         if datam.loc[i][0:4]!='http':
-            name=datam[i].split()
+            name=datam.loc[i].split()
             print(name)
             namelist.append(name[0])
             urllist.append(i)
