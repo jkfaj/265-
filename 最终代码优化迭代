@@ -484,7 +484,7 @@ def execute_one(name='请命名',silence=default_silence,thresh=default_thresh):
     trans_num=len(all_name)
     #两个线程上传阿里云
     threads=[ threading.Thread(target=part_aliyun, args=(0,int(trans_num/2),all_name),
-              threading.Thread(target=part_aliyun, args=(int(trans_num/2),trans_num,all_name)]
+              threading.Thread(target=part_aliyun, args=(int(trans_num/2),trans_num,all_name))]
     for t in threads:
         t.start()
 
