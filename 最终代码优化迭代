@@ -27,6 +27,9 @@ import zipfile
 '''
 全局变量声明
 '''
+default_silence=630
+default_thresh=-30
+
 rootpath='C:\\Users\\Administrator\\Desktop\\test2\\'
 chunkspath=rootpath+'chunks\\'
 wavpath=rootpath+'转wav\\'
@@ -152,6 +155,24 @@ def single():
   将下载链接中多人进行拆分成单人，然后
 '''
     datam=dataurl
+    namelist=[]
+    urllist=[]
+    silencelist=[]
+    threshlist=[]
+    for i in range(0,len(datam),1):
+        if datam[i]!='http':
+            name=datam[i].split()
+            namelist.append(name[0])
+            urllist.append(i)
+                if len(name)>1:
+                    silencelist.append(name[1])
+                    threshlist.appwnd(name[2])
+                else:
+                    silencelist.append(default_silence)
+                    threshlist.appwnd(default_thresh)
+    return namelist,urllist,silencelist,threshlist
+    
+    
 
 def download(dataurl):
 '''
@@ -201,13 +222,13 @@ def trans_format(downloadfile,to_save_trans,oldformat,newformat):
     else:
         print('要转换的格式错误')
 
-def split_trans(audiopath):
+def split_trans(min_silence_len=default_silence,silence_thresh=default_thresh):
     '''
 定义分解转换，方便后面多线程调用，阿里云单独两个线程
 '''
     audiopath=rootpath
     sound = AudioSegment.from_file(audiopath, format='mp3')
-    chunks = split_on_silence(sound,min_silence_len=520,silence_thresh=-30,keep_silence=800)#min_silence_len: 拆分语句时，静默满0.3秒则拆分。silence_thresh：小于-70dBFS以下的为静默。
+    chunks = split_on_silence(sound,min_silence_len,silence_thresh,keep_silence=800)#min_silence_len: 拆分语句时，静默满0.3秒则拆分。silence_thresh：小于-70dBFS以下的为静默。
     if not os.path.exists(chunks_path):os.mkdir(chunks_path)
     for i in range(len(chunks)):
         new = chunks[i]
@@ -438,7 +459,7 @@ if __name__ == "__main__":
     for i in range(100,100+onum,1):
         audioname=str(i)
         audiopath=rootpath+audioname+'.mp3'
-        t = threading.Thread(target=split_trans, args=(audiopath))
+        t = threading.Thread(target=split_trans, args=(default_silence,default_thresh))
         thread_list.append(t)
         t.start()
 
@@ -466,6 +487,9 @@ if __name__ == "__main__":
     zipDir(chunkspath,rootpath+'请命名.zip')
     houzhui()
     zipDir(chunkspath,rootpath+'请命名_hz.zip')
+ 
+
+    
     timetotal2=datetime.now()
     time_total=timetotal2-timetotal1
     print('代码运行总时间',time_total)
