@@ -426,11 +426,6 @@ def zipDir(source_dir, output_filename):
         return output_filename
     return
 
-def filemove():
-'''
-将两个压缩文件移动到指定的路径，解决重名问题
-'''
-    shutil.copy()
 
 def execute_one(name='请命名',silence,thresh):
 '''
@@ -438,16 +433,6 @@ def execute_one(name='请命名',silence,thresh):
 '''
     remove_file(rootpath,type='.zip')
     remove_file(chunkspath,wavpath,type='all')
-
-    #下载完成之后清空桌面下载链接,重新做已经存在，跑新的就不为空
-    #调整，多人物怎么调整
-    if dataurl.empty is False:
-        print('正在下载链接中语音')
-        remove_file(rootpath,type='.mp3')
-        download(dataurl)
-    else:
-        print('跳过下载，直接使用test2里面mp3')
-
 
     trans_format(rootpath,rootpath,'.mp4','.mp3')
 
@@ -497,6 +482,16 @@ def execute_one(name='请命名',silence,thresh):
 
 if __name__ == "__main__":
     timetotal1=datetime.now()
+
+     #下载完成之后清空桌面下载链接,重新做已经存在，跑新的就不为空
+    #调整，多人物怎么调整
+    if dataurl.empty is False:
+        print('正在下载链接中语音')
+        remove_file(rootpath,type='.mp3')
+        download(dataurl)
+    else:
+        print('跳过下载，直接使用test2里面mp3')
+
 
  
 
