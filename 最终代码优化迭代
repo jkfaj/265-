@@ -172,8 +172,9 @@ def single():
     silencelist=[]
     threshlist=[]
     for i in range(0,len(datam),1):
-        if datam[i]!='http':
+        if datam.loc[i][0:4]!='http':
             name=datam[i].split()
+            print(name)
             namelist.append(name[0])
             urllist.append(i)
             if len(name)>1:
