@@ -150,9 +150,7 @@ def remove_file(*path,type=all):
                     os.remove(newpath+f)
 
 def downfenbianlv(downloadfile,url):
-'''
-  下载最低画质视频
-'''
+
     try:
         os.system("you-get -o "+downloadfile+"  --format=dash-flv360 "+url)
     except:
