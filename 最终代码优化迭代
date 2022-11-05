@@ -116,7 +116,7 @@ if enableVoiceDetection :
 
 
 
-timetotal1=datetime.now()
+
 
 def remove_file(*path,type=all):
     '''函数作用就是删除不同指定路径下指定格式的文件
@@ -396,7 +396,7 @@ def zipDir(source_dir, output_filename):
 
 def filemove():
 '''
-将两个压缩文件移动到指定的路径
+将两个压缩文件移动到指定的路径，解决重名问题
 '''
 
 
@@ -456,6 +456,7 @@ if __name__ == "__main__":
     log_file=rootpath+"日志\\"+now_time+'.txt'
     data2.to_csv(log_file,index=False,sep=' ')
     rename_mp3()
+    #if判断，如果是，则用传进来的名字命名，如果不是请命名
     zipDir(chunkspath,rootpath+'请命名.zip')
     houzhui()
     zipDir(chunkspath,rootpath+'请命名_hz.zip')
