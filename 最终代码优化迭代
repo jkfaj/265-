@@ -209,28 +209,20 @@ def download(downurl):
 
 
 
-def trans_format(downloadfile,to_save_trans,oldformat,newformat):
+def trans_format(newformat):
 
  # 格式转换  mp4转换成mp3 mp3转换成pcm
 
           
     #批量转换格式转换为mp3并删除mp4
     if newformat=='.mp3':
-        for i in os.listdir(downloadfile):
-            if  os.path.splitext(i)[-1]==oldformat:
-                trans_name=downloadfile+i
-                save_name=downladfile+os.path.splitext(i)[0]+newformat
+        for i in os.listdir(rootpath):
+            if  os.path.splitext(i)[-1]=='.mp4':
+                trans_name=rootpath+i
+                save_name=rootpath+os.path.splitext(i)[0]+'.mp4'
                 code='ffmpeg -y -i ' +trans_name+' -f mp3 '+save_name
                 subprocess.check_output(code,shell=True)
-    elif newformat=='.pcm':
-        for i in os.listdir(downloadfile):
-            trans_name=downloadfile+i
-            save_name=to_save_trans+os.path.splitext(i)[0]+'.pcm'
-            code='ffmpeg -y -i ' +trans_name+' -acodec pcm_s16le -f s16le -ac 1 -ar 16000 '+save_name
-            subprocess.check_output(code,shell=True)
-
-    else:
-        print('要转换的格式错误')
+    
 
 def split_trans(min_silence_len=default_silence,silence_thresh=default_thresh):
     
