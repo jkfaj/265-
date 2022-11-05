@@ -257,6 +257,7 @@ def rename_test(audiofile):
     for i in os.listdir(audiofile):
     #将mp3进行重命名，命名成数字，避免中文出现问题
        if  os.path.splitext(i)[-1]=='.mp4':
+            print(i)
         
             onum+=1
             onewname=audiofile+str(upnum)+'.mp4'
