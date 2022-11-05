@@ -36,8 +36,12 @@ wavpath=rootpath+'转wav\\'
 logpath=rootpath+'日志\\'
 dataurl=pd.read_csv('C:\\Users\\Administrator\\Desktop\\下载链接.txt',header=None,sep='\n')
 data2=pd.DataFrame(data=None,columns=['编号','语音内容'])
-# ziptofile=
-# ziptofile_hz=
+ziptofile='E:\\test2\\新版语音包纯净版本\\'
+ziptofile_hz='E:\\test2\\新版语音包带后缀版本\\'
+if not os.path.exists(ziptofile):os.mkdir(ziptofile)
+if not os.path.exists(ziptofile_hz):os.mkdir(ziptofile_hz)
+
+
 
 #阿里云参数
 access_key_id = 'LTAI5tDCdQARDVh2XYMjJGLa'
@@ -169,7 +173,7 @@ def single():
                     threshlist.appwnd(name[2])
                 else:
                     silencelist.append(default_silence)
-                    threshlist.appwnd(default_thresh)
+                    threshlist.append(default_thresh)
     return namelist,urllist,silencelist,threshlist
     
     
@@ -426,17 +430,15 @@ def filemove():
 将两个压缩文件移动到指定的路径，解决重名问题
 '''
 
-
-
-
-if __name__ == "__main__":
-    timetotal1=datetime.now()
-    #删除chunks wav下所有文件，test2下mp3以及rar文件
-
+def execute_one(name='请命名',silence,thresh):
+'''
+  执行单个人物的执行代码
+'''
     remove_file(rootpath,type='.zip')
     remove_file(chunkspath,wavpath,type='all')
 
     #下载完成之后清空桌面下载链接,重新做已经存在，跑新的就不为空
+    #调整，多人物怎么调整
     if dataurl.empty is False:
         print('正在下载链接中语音')
         remove_file(rootpath,type='.mp3')
@@ -444,8 +446,6 @@ if __name__ == "__main__":
     else:
         print('跳过下载，直接使用test2里面mp3')
 
-    #清空桌面下载链接中的链接
-    file = open(dataurl, 'w').close()
 
     trans_format(rootpath,rootpath,'.mp4','.mp3')
 
@@ -459,7 +459,7 @@ if __name__ == "__main__":
     for i in range(100,100+onum,1):
         audioname=str(i)
         audiopath=rootpath+audioname+'.mp3'
-        t = threading.Thread(target=split_trans, args=(default_silence,default_thresh))
+        t = threading.Thread(target=split_trans, args=(silence,thresh))
         thread_list.append(t)
         t.start()
 
@@ -484,9 +484,15 @@ if __name__ == "__main__":
     data2.to_csv(log_file,index=False,sep=' ')
     rename_mp3()
     #if判断，如果是，则用传进来的名字命名，如果不是请命名
-    zipDir(chunkspath,rootpath+'请命名.zip')
+    zipDir(chunkspath,rootpath+name+'.zip')
     houzhui()
-    zipDir(chunkspath,rootpath+'请命名_hz.zip')
+    zipDir(chunkspath,rootpath+name+'_hz.zip')
+ 
+
+
+if __name__ == "__main__":
+    timetotal1=datetime.now()
+
  
 
     
