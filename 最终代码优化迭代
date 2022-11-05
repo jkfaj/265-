@@ -455,7 +455,7 @@ def execute_one(name='请命名',silence=default_silence,thresh=default_thresh):
     remove_file(rootpath,type='.zip')
     remove_file(chunkspath,wavpath,type='all')
 
-    trans_format(rootpath,rootpath,'.mp4','.mp3')
+    trans_format('.mp3')
 
     remove_file(rootpath,type='.xml')
     remove_file(rootpath,type='.mp4')
