@@ -31,11 +31,16 @@ import shutil
 default_silence=630
 default_thresh=-30
 
+#改后缀的地方
+hzcontent='（素材分享群：123593137，获取更多素材）.mp3'
+       
+
 rootpath='C:\\Users\\Administrator\\Desktop\\test2\\'
 chunkspath=rootpath+'chunks\\'
 wavpath=rootpath+'转wav\\'
 logpath=rootpath+'日志\\'
-dataurl=pd.read_csv('C:\\Users\\Administrator\\Desktop\\下载链接.txt',header=None,sep='\n')
+txtpath='C:\\Users\\Administrator\\Desktop\\下载链接.txt'
+dataurl=pd.read_csv(txtpath,header=None,sep='\n')
 data2=pd.DataFrame(data=None,columns=['编号','语音内容'])
 ziptofile='E:\\test2\\新版语音包纯净版本\\'
 ziptofile_hz='E:\\test2\\新版语音包带后缀版本\\'
@@ -396,7 +401,7 @@ def houzhui():
     for i in os.listdir(chunkspath):
         oldname=chunkspath+i
         newi=os.path.splitext(i)[0]
-        newname=chunkspath+newi+'（素材分享群：123593137，获取更多素材）.mp3'
+        newname=chunkspath+newi+hzcontent
         os.rename(oldname,newname)
                 
 
@@ -425,6 +430,30 @@ def zipDir(source_dir, output_filename):
         zipf.close()
         return output_filename
     return
+
+def movefile():
+'''
+复制到指定位置，然后解决重名问题要是重名了 改名
+
+'''
+    num=1
+
+    for j in os.listdir(rootpath):
+        if j.endswith('_hz.zip'):
+            zipname=os.path.splitext(j)[0]
+        if j.endswith('语音包新版本.zip'):
+            ziphzname=os.path.splitext(j)[0]
+      #用后缀版本解决重命名     
+    for i in os.listdir(ziptofile_hz):
+        
+        while os.path.splitext(i)[0]==ziphzname:
+            num+=1
+            ziphzname=ziphzname+str(num)
+            zipname=ziphzname+str(num)
+    
+    shutil.copy(rootpath+name+'语音包新版本.zip',ziptofile+zipname+'.zip')
+    shutil.copy(rootpath+name+'语音包新版本_hz.zip',ziptofile_hz+ziphzname+'.zip')
+ 
 
 
 def execute_one(name='请命名',silence,thresh):
@@ -471,12 +500,10 @@ def execute_one(name='请命名',silence,thresh):
     data2.to_csv(log_file,index=False,sep=' ')
     rename_mp3()
     #if判断，如果是，则用传进来的名字命名，如果不是请命名
-    zipDir(chunkspath,rootpath+name+'.zip')
+    zipDir(chunkspath,rootpath+name+'语音包新版本.zip')
     houzhui()
-    zipDir(chunkspath,rootpath+name+'_hz.zip')
-    shutil.copy(rootpath+name+'.zip',ziptofile+name+'.zip')
-    shutil.copy(rootpath+name+'_hz.zip',ziptofile+name+'_hz.zip')
- 
+    zipDir(chunkspath,rootpath+name+'语音包新版本_hz.zip')
+    movefile()
  
 
 
@@ -488,14 +515,29 @@ if __name__ == "__main__":
     if dataurl.empty is False:
         print('正在下载链接中语音')
         remove_file(rootpath,type='.mp3')
-        download(dataurl)
-    else:
-        print('跳过下载，直接使用test2里面mp3')
+        namelist,urllist,silencelist,threshlist=single()
+        urlnum=len(dataurl)
+        if len(namelist)=1:
+            download(dataurl[1:urlnum])
+            execute_one(namelist[0])
+        elif len(namelist)=0 :
+            download(dataurl)
+            execute_one()
+        elif len(namelist)>1:
+            for i in range(0,len(namelist)-1,1):
+                download(dataurl[urllist[i]+1:urllist[i+1]])
+                execute_one(namelist[i],silencelist[i],thresh[i])
+            
+            download(dataurl[urllist[len(namelist)-1]+1:urllist[urlnum]])
+            execute_one(namelist[len(namelist)-1],silencelist[len(namelist)-1],thresh[len(namelist)-1])
+                
+     print('跳过下载，直接使用test2里面mp3')
+     execute_one()
 
 
  
 
-    
+    file= open(txtpath,'w').close()
     timetotal2=datetime.now()
     time_total=timetotal2-timetotal1
     print('代码运行总时间',time_total)
