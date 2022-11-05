@@ -456,7 +456,7 @@ def movefile():
  
 
 
-def execute_one(name='请命名',silence,thresh):
+def execute_one(name='请命名',silence=default_silence,thresh=default_thresh):
 '''
   执行单个人物的执行代码
 '''
