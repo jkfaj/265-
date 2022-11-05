@@ -510,10 +510,10 @@ if __name__ == "__main__":
         remove_file(rootpath,type='.mp3')
         namelist,urllist,silencelist,threshlist=single()
         urlnum=len(dataurl)
-        if len(namelist)=1:
+        if len(namelist)==1:
             download(dataurl[1:urlnum])
             execute_one(namelist[0])
-        elif len(namelist)=0 :
+        elif len(namelist)==0 :
             download(dataurl)
             execute_one()
         elif len(namelist)>1:
