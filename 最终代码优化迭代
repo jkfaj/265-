@@ -159,9 +159,7 @@ def downfenbianlv(downloadfile,url):
         os.system("you-get -o "+downloadfile+"  "+url)
 
 def single():
-'''
-  将下载链接中多人进行拆分成单人，然后
-'''
+
     datam=dataurl
     namelist=[]
     urllist=[]
