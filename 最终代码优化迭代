@@ -425,7 +425,7 @@ def zipDir(source_dir, output_filename):
         return output_filename
     return
 
-def movefile():
+def movefile(name):
 
 #复制到指定位置，然后解决重名问题要是重名了 改名
 
@@ -494,7 +494,7 @@ def execute_one(name='请命名',silence=default_silence,thresh=default_thresh):
     zipDir(chunkspath,rootpath+name+'语音包新版本.zip')
     houzhui()
     zipDir(chunkspath,rootpath+name+'语音包新版本_hz.zip')
-    movefile()
+    movefile(name)
  
 
 
