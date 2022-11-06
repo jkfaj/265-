@@ -40,7 +40,7 @@ chunkspath=rootpath+'chunks\\'
 wavpath=rootpath+'转wav\\'
 logpath=rootpath+'日志\\'
 txtpath='C:\\Users\\Administrator\\Desktop\\下载链接.txt'
-dataurl=pd.read_csv(txtpath,header=None,sep='\n')
+
 data2=pd.DataFrame(data=None,columns=['编号','语音内容'])
 
 ziptofile='E:\\test2\\新版语音包纯净版本\\'
