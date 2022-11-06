@@ -435,20 +435,30 @@ def movefile(name):
 
     for j in os.listdir(rootpath):
         if j.endswith('_hz.zip'):
-            zipname=os.path.splitext(j)[0]
-        if j.endswith('语音包新版本.zip'):
             ziphzname=os.path.splitext(j)[0]
+        if j.endswith('语音包新版本.zip'):
+            zipname=os.path.splitext(j)[0]
       #用后缀版本解决重命名     
-    for i in os.listdir(ziptofile_hz):
+    for i in os.listdir(ziptofile):
         
-        while os.path.splitext(i)[0]==ziphzname:
+        while os.path.splitext(i)[0]==zipname:
             if num>1:
-                ziphzname=ziphzname.split('_')[0]+'_'+str(num)
-                zipname=ziphzname.split('_')[0]+'_'+str(num)
+                
+                zipname=zipname.split('_')[0]+'_'+str(num)
             else:
                 num+=1
+                
+                zipname=zipname+'_'+str(num)
+
+    for i in os.listdir(ziptofile_hz):
+        while os.path.splitext(i)[0]==ziphzname:
+            if num>1:
+                
+                ziphzname=ziphzname.split('_')[0]+'_hz_'+str(num)
+            else:
+                num+=1
+                
                 ziphzname=ziphzname+'_'+str(num)
-                zipname=ziphzname+'_'+str(num)
     
     shutil.copy(rootpath+name+'语音包新版本.zip',ziptofile+zipname+'.zip')
     shutil.copy(rootpath+name+'语音包新版本_hz.zip',ziptofile_hz+ziphzname+'.zip')
