@@ -442,9 +442,13 @@ def movefile(name):
     for i in os.listdir(ziptofile_hz):
         
         while os.path.splitext(i)[0]==ziphzname:
-            num+=1
-            ziphzname=ziphzname+str(num)
-            zipname=ziphzname+str(num)
+            if num>1:
+                ziphzname=ziphzname.split('_')[0]+'_'+str(num)
+                zipname=ziphzname.split('_')[0]+'_'+str(num)
+            else:
+                num+=1
+                ziphzname=ziphzname+'_'+str(num)
+                zipname=ziphzname+'_'+str(num)
     
     shutil.copy(rootpath+name+'语音包新版本.zip',ziptofile+zipname+'.zip')
     shutil.copy(rootpath+name+'语音包新版本_hz.zip',ziptofile_hz+ziphzname+'.zip')
