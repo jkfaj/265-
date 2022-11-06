@@ -226,7 +226,7 @@ def trans_format(newformat):
                 #subprocess.check_output(code,shell=True)
     
 
-def split_trans(audiopath,min_silence_len=default_silence,silence_thresh=default_thresh):
+def split_trans(audiopath,audioname,min_silence_len=default_silence,silence_thresh=default_thresh):
     
 #定义分解转换，方便后面多线程调用，阿里云单独两个线程
 
@@ -485,7 +485,7 @@ def execute_one(name='请命名',silence=default_silence,thresh=default_thresh):
     for i in range(100,100+onum,1):
         audioname=str(i)
         audiopath=rootpath+audioname+'.mp3'
-        t = threading.Thread(target=split_trans, args=(audiopath,silence,thresh))
+        t = threading.Thread(target=split_trans, args=(audiopath,audioname,silence,thresh))
         print('多线程切分')
         thread_list.append(t)
         t.start()
