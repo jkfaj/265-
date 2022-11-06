@@ -221,7 +221,8 @@ def trans_format(newformat):
                 trans_name=rootpath+i
                 save_name=rootpath+os.path.splitext(i)[0]+'.mp3'
                 code='ffmpeg -y -i ' +trans_name+' -f mp3 '+save_name
-                subprocess.check_output(code,shell=True)
+                os.system(code)
+                #subprocess.check_output(code,shell=True)
     
 
 def split_trans(min_silence_len=default_silence,silence_thresh=default_thresh):
