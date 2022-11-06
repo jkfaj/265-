@@ -220,26 +220,27 @@ def trans_format(newformat):
             if  os.path.splitext(i)[-1]=='.mp4':
                 trans_name=rootpath+i
                 save_name=rootpath+os.path.splitext(i)[0]+'.mp3'
-                code='ffmpeg -y -i ' +trans_name+' -f mp3 '+save_name
+                code='start ffmpeg -y -i ' +trans_name+' -f mp3 '+save_name
                 os.system(code)
                 #subprocess.check_output(code,shell=True)
     
 
-def split_trans(min_silence_len=default_silence,silence_thresh=default_thresh):
+def split_trans(audiopath,min_silence_len=default_silence,silence_thresh=default_thresh):
     
 #定义分解转换，方便后面多线程调用，阿里云单独两个线程
 
-    audiopath=rootpath
+    
     sound = AudioSegment.from_file(audiopath, format='mp3')
     chunks = split_on_silence(sound,min_silence_len,silence_thresh,keep_silence=800)#min_silence_len: 拆分语句时，静默满0.3秒则拆分。silence_thresh：小于-70dBFS以下的为静默。
     if not os.path.exists(chunks_path):os.mkdir(chunks_path)
+    print(len(chunks))
     for i in range(len(chunks)):
         new = chunks[i]
         save_name = chunks_path+audioname+'%04d.%s'%(i,'mp3')
         new.export(save_name, format='mp3')
         mp3name=save_name.split("\\")[-1]
         pcm_name=wavpath+os.path.splitext(mp3name)[0]+'.pcm'
-        code='ffmpeg -y -i ' +save_name+' -acodec pcm_s16le -f s16le -ac 1 -ar 16000 '+pcm_name
+        code='start ffmpeg -y -i ' +save_name+' -acodec pcm_s16le -f s16le -ac 1 -ar 16000 '+pcm_name
         os.system(code)
         #subprocess.check_output(code,shell=True)
 
@@ -483,7 +484,7 @@ def execute_one(name='请命名',silence=default_silence,thresh=default_thresh):
     for i in range(100,100+onum,1):
         audioname=str(i)
         audiopath=rootpath+audioname+'.mp3'
-        t = threading.Thread(target=split_trans, args=(silence,thresh))
+        t = threading.Thread(target=split_trans, args=(audiopath,silence,thresh))
         print('多线程切分')
         thread_list.append(t)
         t.start()
