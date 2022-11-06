@@ -467,6 +467,7 @@ def execute_one(name='请命名',silence=default_silence,thresh=default_thresh):
         audioname=str(i)
         audiopath=rootpath+audioname+'.mp3'
         t = threading.Thread(target=split_trans, args=(silence,thresh))
+        print('多线程切分')
         thread_list.append(t)
         t.start()
 
